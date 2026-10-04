@@ -7,9 +7,10 @@ public static class BlockedUserChecker
     public static int CountBlocked(List<int> blockedIds, int[] requestIds)
     {
         var blocked = 0;
+        var set = new HashSet<int>(blockedIds); 
         foreach (var id in requestIds)
         {
-            if (blockedIds.Contains(id))
+            if (set.Contains(id))
                 blocked++;
         }
         return blocked;

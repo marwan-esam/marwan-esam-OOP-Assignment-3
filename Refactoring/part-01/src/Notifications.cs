@@ -1,47 +1,55 @@
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.Text;
+
 namespace RefactoringLab;
+
+public interface INotificationChannel
+{
+    public string Channel {get;}
+}
+
+public class EmailChannel : INotificationChannel
+{
+    public string Channel {get; private set;} = "email";
+}
+
+public class SmsChannel : INotificationChannel
+{
+    public string Channel {get; private set;} = "sms";
+}
+
+public class WhatsappChannel : INotificationChannel
+{
+    public string Channel {get; private set;} = "whatsapp";
+}
 
 public class Notification
 {
-    public virtual void Send(string to, string message) =>
-        Console.WriteLine($"notify {to}: {message}");
-}
+    public INotificationChannel NotificationChannel {get; private set;}
+    public bool IsUrgent {get; private set;}
+    public DateTime? SendAt {get; private set;}
 
-public class EmailNotification : Notification
-{
-    public override void Send(string to, string message) =>
-        Console.WriteLine($"[email] {to}: {message}");
-}
+    public Notification(INotificationChannel notificationChannel)
+    {
+        NotificationChannel = notificationChannel;
+    }
 
-public class SmsNotification : Notification
-{
-    public override void Send(string to, string message) =>
-        Console.WriteLine($"[sms] {to}: {message}");
-}
+    public void MarkAsUrgent()
+    {
+        IsUrgent = true;
+    }
 
-public class UrgentEmailNotification : EmailNotification
-{
-    public override void Send(string to, string message) =>
-        base.Send(to, $"[URGENT] {message}");
-}
+    public void SetScheduledDate(DateTime? at)
+    {
+        SendAt = at;
+    }
 
-public class UrgentSmsNotification : SmsNotification
-{
-    public override void Send(string to, string message) =>
-        base.Send(to, $"[URGENT] {message}");
-}
-
-public class UrgentScheduledEmailNotification : UrgentEmailNotification
-{
-    public DateTime SendAt { get; set; }
-
-    public override void Send(string to, string message) =>
-        Console.WriteLine($"[email scheduled {SendAt:g}] {to}: [URGENT] {message}");
-}
-
-public class UrgentScheduledSmsNotification : UrgentSmsNotification
-{
-    public DateTime SendAt { get; set; }
-
-    public override void Send(string to, string message) =>
-        Console.WriteLine($"[sms scheduled {SendAt:g}] {to}: [URGENT] {message}");
+    public void Send(string to, string message) {
+        string notificationMessage = $"[{NotificationChannel.Channel}" + 
+                                    (SendAt is not null ? $" scheduled {SendAt:g}" : "")  + $"] {to}: " + 
+                                    (IsUrgent == true ? "[URGENT] " : "") + message;
+        
+        System.Console.WriteLine(notificationMessage);
+    }
 }
