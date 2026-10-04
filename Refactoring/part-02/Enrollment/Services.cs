@@ -1,5 +1,20 @@
 namespace RefactoringLab.Part02.Enrollment;
 
+public class EnrollmentFacade
+{
+    public void Enroll(string studentId, string courseId, decimal amount)
+    {
+        var payment = new PaymentGateway();
+        var seats = new SeatInventory();
+        var invoices = new InvoiceGenerator();
+        var email = new EmailService();
+
+        payment.Charge(studentId, amount);
+        seats.Reserve(courseId, studentId);
+        var invoiceId = invoices.Create(studentId, amount);
+        email.Send(studentId, "Enrollment confirmed", $"Invoice {invoiceId} for {courseId}");
+    }
+}
 public class PaymentGateway
 {
     public void Charge(string studentId, decimal amount) =>
