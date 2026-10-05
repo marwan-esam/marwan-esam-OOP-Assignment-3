@@ -1,38 +1,30 @@
+using System.Runtime.CompilerServices;
+
 namespace Generics;
 
-public class Store<T>
+public class Store<T> where T : class, IHasId
 {
-  private List<T> _items = [];
-    public void Add(T newItem)
-    {
-      ArgumentNullException.ThrowIfNull(newItem);
-      _items.Add(newItem);
-    }
+  private Dictionary<int, T> _items = [];
+  public void Add(T newItem)
+  {
+    ArgumentNullException.ThrowIfNull(newItem);
+    if(!_items.TryAdd(newItem.Id, newItem)) throw new InvalidOperationException($"Cannot add another {(newItem is Student ? "student" : "course")} with the same id");
+  }
 
   public T? GetById(int id)
   {
-    foreach(T item in _items)
-    {
-      if(item.Id == id) return  item;
-    }
-    return null;
+    T? item = null;
+    _items.TryGetValue(id, out item);
+    return item;
   }
 
-  public IReadOnlyList<T> GetAll()
+  public IEnumerable<T> GetAll()
   {
-    return _items;
+    return _items.Values;
   }
 
   public bool Remove(int id)
   {
-    foreach(T item in _items)
-    {
-      if(item.Id == id)
-      {
-        _students.Remove(student);
-        return true;
-      }
-    }
-    return false;
+    return _items.Remove(id);
   }
 }
