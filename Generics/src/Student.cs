@@ -12,4 +12,9 @@ public class Student : IHasId
     Id = id;
     Name = name;
   }
+
+  public override string ToString()
+  {
+    return $"[Student] ID: {Id}, Name: {Name}";
+  }
 }

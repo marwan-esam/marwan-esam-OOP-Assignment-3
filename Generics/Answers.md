@@ -8,3 +8,10 @@ The logic and structure of the two stores are completely identical (the methods 
 **Compiler error and explanation:**
 Error: `CS1061: 'T' does not contain a definition for 'Id'` (and returning null might fail if `T` is a value type).
 The compiler rejects the code because `T` is an unconstrained generic type, meaning it could be literally any type in C# (an `int`, a `string`, a custom class). The compiler has no guarantee that whatever type `T` ends up being will actually have an `Id` property. Furthermore, if `T` is a value type (like a struct), it cannot be returned as `null`.
+
+## Step 7
+**Why does `new Store<string>()` not compile?**
+It refuses to compile because of the generic constraint `where T : class, IHasId`. The `string` type does not implement our `IHasId` interface, so the compiler safely prevents us from creating a store of strings.
+
+**What is the common name for the kind of class you built in Steps 4 and 5?**
+This is known as the **Repository Pattern** (specifically, a **Generic Repository**). It acts as an in-memory collection-like interface for accessing and managing data objects, hiding the underlying storage mechanism (like our `Dictionary`) from the rest of the application.
