@@ -6,23 +6,33 @@ public static class EnumerableExtensions
   {
     if(pageNumber < 1 || pageSize < 1) throw new ArgumentOutOfRangeException("Page Number and Page Size cannot be less than 1");
     int toSkip = (pageNumber - 1) * pageSize;
-    int skipped = 0;
-    int taken = 0;
-    foreach(T item in source)
-    {
-      if(skipped < toSkip)
-      {
-        skipped++;
-        continue;
-      }
 
-      if(taken < pageSize)
+    if(source is IList<T> list) // if it's a list we can skip looping from the beginning and use index math instead
+    {
+      for(int i = toSkip ; i < toSkip + pageSize && i < list.Count ; i++)
       {
-        taken++;
-        yield return item;
-      } else
+        yield return list[i];
+      }
+    } else // otherwise it's more like a stream (doesn't have indexer) and so we have to loop from the beggining
+    {
+      int skipped = 0;
+      int taken = 0;
+      foreach(T item in source)
       {
-        break;
+        if(skipped < toSkip)
+        {
+          skipped++;
+          continue;
+        }
+
+        if(taken < pageSize)
+        {
+          taken++;
+          yield return item;
+        } else
+        {
+          break;
+        }
       }
     }
   }
